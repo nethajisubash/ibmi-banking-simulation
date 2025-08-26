@@ -15,6 +15,8 @@ The system processes customer payments through the following steps:
 6. **Audit Logging** → `P1_AUDIT_LOG` records all key actions.
 
 ---
+<img width="315" height="430" alt="image" src="https://github.com/user-attachments/assets/29c5b783-d6e1-46d3-aad4-9cc36c46eadc" />
+<img width="954" height="529" alt="image" src="https://github.com/user-attachments/assets/81d718b7-db8e-4f56-a67f-6cb139a6dceb" />
 
 ## 📂 Repository Structure
 
