@@ -1,0 +1,30 @@
+CREATE OR REPLACE PROCEDURE P1_POST_GL (IN p_pay_id INT)
+LANGUAGE SQL
+BEGIN
+  DECLARE v_from CHAR(14);
+  DECLARE v_amt  DECIMAL;
+  DECLARE v_curr CHAR(3);
+  DECLARE v_status VARCHAR(12);
+
+  SELECT FROM_ACCT, AMT, CURR, STATUS
+    INTO v_from, v_amt, v_curr, v_status
+  FROM P1_PAYMENTS WHERE PAY_ID=p_pay_id;
+
+  IF v_status <> 'APPROVED' THEN
+    SIGNAL SQLSTATE '75000'
+      SET MESSAGE_TEXT = 'Payment not approved for posting';
+  END IF;
+
+  UPDATE P1_CUSTOMER_ACCTS
+     SET BALANCE = BALANCE - v_amt
+   WHERE CUST_ACCT = v_from;
+
+  UPDATE P1_GL_ACCOUNTS
+     SET BALANCE = BALANCE + v_amt
+   WHERE GL_ACCT='1000000001';
+
+  UPDATE P1_PAYMENTS SET STATUS='POSTED' WHERE PAY_ID=p_pay_id;
+
+  INSERT INTO P1_AUDIT_LOG (ENTITY, REF_ID, ACTION, DETAILS)
+  VALUES ('GL', CAST(p_pay_id AS VARCHAR(20)),'POST','Debited customer; credited clearing GL');
+END;
